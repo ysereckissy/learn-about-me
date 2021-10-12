@@ -25,18 +25,18 @@ userSchema.methods.name = function() {
     return this.displayName || this.username 
 };
 
-const noop = () => {}
+const noop = function() {}
 
 userSchema.pre("save", function(done) {
     const user = this;
     if(!user.isModified("password")) {
         return done();
     }
-    bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
+    bcrypt.genSalt(SALT_FACTOR, function(err, salt) {
         if(err) {
             return done(err);
         }
-        bcrypt.hash(user.password, salt, noop, (err, hashedPassword) => {
+        bcrypt.hash(user.password, salt, noop, function(err, hashedPassword) {
             if(err) {
                 return done(err);
             }
@@ -46,8 +46,8 @@ userSchema.pre("save", function(done) {
     });
 });
 
-userSchema.methods.checkPassword = (guess, done) => {
-    bcrypt.compare(guess, this.password, (err, isMatch) => {
+userSchema.methods.checkPassword = function(guess, done) {
+    bcrypt.compare(guess, this.password, function(err, isMatch) {
         done(err, isMatch);
     });
 };

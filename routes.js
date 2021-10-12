@@ -67,7 +67,47 @@ router.get("/users/:username", (request, response, next) => {
         response.render("profile", {
             user: user,
         });
-    })
-})
+    });
+});
+
+router.get("/login", (req, res) => {
+    res.render("login");
+});
+
+router.post("/login", passport.authenticate("login", {
+    successRedirect: "/",
+    failureRedirect: "/login",
+    failureFlash: true,
+}));
+
+router.get("/logout", (req, res) => {
+    req.logout();
+    res.redirect("/");
+});
+
+const ensureAuthenticated = (req, res, next) => {
+    if(req.isAuthenticated()) {
+        next();
+    } else {
+        req.flash("info", "You must be logged in to see this page.");
+        res.redirect("/login");
+    }
+};
+
+router.get("/edit", ensureAuthenticated, (req, res) => {
+    res.render("edit");
+});
+router.post("/edit", ensureAuthenticated, (req, res, next) => {
+    req.user.displayName = req.body.displayName;
+    req.user.bio = req.body.bio;
+    req.user.save((err) => {
+        if(err) {
+            next(err);
+            return;
+        }
+        req.flash("info", "Profile updated!");
+        res.redirect("/edit");
+    });
+});
 
 module.exports = router;
