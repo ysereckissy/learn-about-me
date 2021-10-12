@@ -54,4 +54,20 @@ router.post("/signup", (request, response, next) => {
     failureFlash: true,
 }));
 
+router.get("/users/:username", (request, response, next) => {
+    User.findOne({
+        username: request.params.username,
+    }, (error, user) => {
+        if(error) {
+            return next(error);
+        }
+        if(!user) {
+            return next(404);
+        }
+        response.render("profile", {
+            user: user,
+        });
+    })
+})
+
 module.exports = router;
